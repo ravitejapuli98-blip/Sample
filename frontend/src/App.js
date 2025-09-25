@@ -183,17 +183,19 @@ const App = () => {
             value={selectedCity}
             onChange={(value) => {
               console.log('City selected:', value);
-              setSelectedCity(value);
-              // Show immediate feedback
-              alert(`City changed to: ${value} 🏙️\n\nUpdating dashboard with ${value} data...`);
+              if (value) {
+                setSelectedCity(value);
+                // Show immediate feedback without blocking
+                console.log(`City changed to: ${value} - Updating dashboard...`);
+              }
             }}
             style={{ width: '100%' }}
             size="large"
             placeholder="Select a Michigan city"
             showSearch
             filterOption={(input, option) => {
-              const cityName = option.children[1].props.children;
-              return cityName.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+              // Simple and safe search - just check if the option value contains the input
+              return option.value.toLowerCase().includes(input.toLowerCase());
             }}
           >
             {cities.map(city => (
@@ -210,33 +212,47 @@ const App = () => {
 
           <Title level={5}>City Overview</Title>
           {(() => {
-            const currentCity = cities.find(c => c.name === selectedCity);
-            console.log('Current city data:', currentCity);
-            return currentCity ? (
-              <Card size="small">
-                <Statistic
-                  title="Sustainability Score"
-                  value={currentCity.sustainability}
-                  suffix="/100"
-                  valueStyle={{ color: '#52c41a' }}
-                />
-                <Progress 
-                  percent={currentCity.sustainability} 
-                  strokeColor="#52c41a"
-                  size="small"
-                  style={{ marginTop: '8px' }}
-                />
-                <div style={{ marginTop: '12px', fontSize: '12px', color: '#666' }}>
-                  <div>Population: {currentCity.population}</div>
-                  <div>Annual Emissions: {currentCity.emissions}</div>
-                  <div>State: {currentCity.state}</div>
-                </div>
-              </Card>
-            ) : (
-              <Card size="small">
-                <Text type="secondary">No city data available</Text>
-              </Card>
-            );
+            try {
+              const currentCity = cities.find(c => c.name === selectedCity);
+              console.log('Current city data:', currentCity);
+              
+              if (!currentCity) {
+                return (
+                  <Card size="small">
+                    <Text type="secondary">Loading city data...</Text>
+                  </Card>
+                );
+              }
+              
+              return (
+                <Card size="small">
+                  <Statistic
+                    title="Sustainability Score"
+                    value={currentCity.sustainability || 0}
+                    suffix="/100"
+                    valueStyle={{ color: '#52c41a' }}
+                  />
+                  <Progress 
+                    percent={currentCity.sustainability || 0} 
+                    strokeColor="#52c41a"
+                    size="small"
+                    style={{ marginTop: '8px' }}
+                  />
+                  <div style={{ marginTop: '12px', fontSize: '12px', color: '#666' }}>
+                    <div>Population: {currentCity.population || 'N/A'}</div>
+                    <div>Annual Emissions: {currentCity.emissions || 'N/A'}</div>
+                    <div>State: {currentCity.state || 'N/A'}</div>
+                  </div>
+                </Card>
+              );
+            } catch (error) {
+              console.error('Error rendering city overview:', error);
+              return (
+                <Card size="small">
+                  <Text type="secondary">Error loading city data</Text>
+                </Card>
+              );
+            }
           })()}
         </Sider>
 
@@ -257,30 +273,44 @@ const App = () => {
             <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
               <Col span={24}>
                 <Card title={`📊 ${selectedCity} City Analysis`} style={{ background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)' }}>
-                  <Row gutter={[16, 16]}>
-                    <Col xs={24} sm={8}>
-                      <Statistic
-                        title="Sustainability Score"
-                        value={cities.find(c => c.name === selectedCity)?.sustainability || 0}
-                        suffix="/100"
-                        valueStyle={{ color: '#52c41a', fontSize: '24px' }}
-                      />
-                    </Col>
-                    <Col xs={24} sm={8}>
-                      <Statistic
-                        title="Population"
-                        value={cities.find(c => c.name === selectedCity)?.population || 'N/A'}
-                        valueStyle={{ color: '#1890ff', fontSize: '20px' }}
-                      />
-                    </Col>
-                    <Col xs={24} sm={8}>
-                      <Statistic
-                        title="Annual CO₂ Emissions"
-                        value={cities.find(c => c.name === selectedCity)?.emissions || 'N/A'}
-                        valueStyle={{ color: '#fa541c', fontSize: '18px' }}
-                      />
-                    </Col>
-                  </Row>
+                  {(() => {
+                    try {
+                      const currentCity = cities.find(c => c.name === selectedCity);
+                      if (!currentCity) {
+                        return <Text type="secondary">Loading city data...</Text>;
+                      }
+                      
+                      return (
+                        <Row gutter={[16, 16]}>
+                          <Col xs={24} sm={8}>
+                            <Statistic
+                              title="Sustainability Score"
+                              value={currentCity.sustainability || 0}
+                              suffix="/100"
+                              valueStyle={{ color: '#52c41a', fontSize: '24px' }}
+                            />
+                          </Col>
+                          <Col xs={24} sm={8}>
+                            <Statistic
+                              title="Population"
+                              value={currentCity.population || 'N/A'}
+                              valueStyle={{ color: '#1890ff', fontSize: '20px' }}
+                            />
+                          </Col>
+                          <Col xs={24} sm={8}>
+                            <Statistic
+                              title="Annual CO₂ Emissions"
+                              value={currentCity.emissions || 'N/A'}
+                              valueStyle={{ color: '#fa541c', fontSize: '18px' }}
+                            />
+                          </Col>
+                        </Row>
+                      );
+                    } catch (error) {
+                      console.error('Error rendering city analysis:', error);
+                      return <Text type="secondary">Error loading city analysis</Text>;
+                    }
+                  })()}
                 </Card>
               </Col>
             </Row>
