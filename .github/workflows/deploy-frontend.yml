@@ -54,7 +54,7 @@ jobs:
     - name: Create S3 bucket if it doesn't exist
       run: |
         aws s3 mb s3://${{ env.S3_BUCKET }} --region ${{ env.AWS_REGION }} || true
-        aws s3api put-bucket-website-configuration --bucket ${{ env.S3_BUCKET }} --website-configuration '{
+        aws s3api put-bucket-website --bucket ${{ env.S3_BUCKET }} --website-configuration '{
           "IndexDocument": {"Suffix": "index.html"},
           "ErrorDocument": {"Key": "index.html"}
         }'
