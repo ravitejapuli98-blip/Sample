@@ -3,7 +3,7 @@ API v1 router configuration
 """
 
 from fastapi import APIRouter
-from app.api.v1.endpoints import cities, policies, simulations, predictions, data, ai
+from app.api.v1.endpoints import cities, policies, simulations, predictions, data, ai, real_data
 
 api_router = APIRouter()
 
@@ -14,3 +14,4 @@ api_router.include_router(simulations.router, prefix="/simulations", tags=["simu
 api_router.include_router(predictions.router, prefix="/predictions", tags=["predictions"])
 api_router.include_router(data.router, prefix="/data", tags=["data"])
 api_router.include_router(ai.router, prefix="/ai", tags=["ai"])
+api_router.include_router(real_data.router, prefix="/real-data", tags=["real-data"])
