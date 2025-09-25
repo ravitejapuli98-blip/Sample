@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ConfigProvider } from 'antd';
-import App from './App.js';
+import App from './App';
 import './index.css';
 
 const root = ReactDOM.createRoot(
