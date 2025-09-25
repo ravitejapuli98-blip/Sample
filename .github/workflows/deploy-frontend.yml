@@ -1,0 +1,87 @@
+name: Deploy Frontend to AWS S3 + CloudFront
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'frontend/**'
+  pull_request:
+    branches: [ main, master ]
+    paths:
+      - 'frontend/**'
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  S3_BUCKET: prod-sus-cities-frontend
+
+jobs:
+  deploy-frontend:
+    name: Deploy Frontend
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        cd frontend
+        npm ci
+
+    - name: Build React app
+      run: |
+        cd frontend
+        npm run build
+      env:
+        REACT_APP_API_URL: http://prod-sus-cities-alb-73707419.us-east-1.elb.amazonaws.com
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Create S3 bucket if it doesn't exist
+      run: |
+        aws s3 mb s3://${{ env.S3_BUCKET }} --region ${{ env.AWS_REGION }} || true
+        aws s3api put-bucket-website-configuration --bucket ${{ env.S3_BUCKET }} --website-configuration '{
+          "IndexDocument": {"Suffix": "index.html"},
+          "ErrorDocument": {"Key": "index.html"}
+        }'
+        aws s3api put-bucket-policy --bucket ${{ env.S3_BUCKET }} --policy '{
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "PublicReadGetObject",
+              "Effect": "Allow",
+              "Principal": "*",
+              "Action": "s3:GetObject",
+              "Resource": "arn:aws:s3:::'${{ env.S3_BUCKET }}'/*"
+            }
+          ]
+        }'
+
+    - name: Upload to S3
+      run: |
+        cd frontend
+        aws s3 sync build/ s3://${{ env.S3_BUCKET }} --delete
+
+    - name: Deploy Complete
+      run: |
+        echo "🚀 Frontend deployed to S3!"
+        echo "🌐 Your frontend is available at:"
+        echo "   http://${{ env.S3_BUCKET }}.s3-website-${{ env.AWS_REGION }}.amazonaws.com"
+        echo ""
+        echo "🔗 Your complete application:"
+        echo "   Frontend: http://${{ env.S3_BUCKET }}.s3-website-${{ env.AWS_REGION }}.amazonaws.com"
+        echo "   Backend API: http://prod-sus-cities-alb-73707419.us-east-1.elb.amazonaws.com"
