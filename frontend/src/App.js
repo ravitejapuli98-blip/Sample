@@ -7,18 +7,17 @@ import {
 import { 
   EnvironmentOutlined, CarOutlined, ThunderboltOutlined, CloudOutlined,
   SearchOutlined, BulbOutlined, BarChartOutlined,
-  CheckCircleOutlined, ClockCircleOutlined,
+  ClockCircleOutlined,
   PlusOutlined, EyeOutlined, DownloadOutlined, ShareAltOutlined
 } from '@ant-design/icons';
 import './App.css';
 
 const { Header, Content, Sider } = Layout;
-const { Title, Paragraph, Text } = Typography;
+const { Title, Text } = Typography;
 const { Option } = Select;
 
 const App = () => {
   const [selectedCity, setSelectedCity] = useState('Detroit');
-  const [selectedPolicy, setSelectedPolicy] = useState('');
   const [showPolicyModal, setShowPolicyModal] = useState(false);
 
   const cities = [
