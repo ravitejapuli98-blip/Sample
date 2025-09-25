@@ -174,11 +174,27 @@ const App = () => {
           <Divider />
 
           <Title level={5}>Select City</Title>
+          <div style={{ marginBottom: '8px' }}>
+            <Text type="secondary" style={{ fontSize: '12px' }}>
+              Currently selected: <Text strong style={{ color: '#1890ff' }}>{selectedCity}</Text>
+            </Text>
+          </div>
           <Select
             value={selectedCity}
-            onChange={setSelectedCity}
+            onChange={(value) => {
+              console.log('City selected:', value);
+              setSelectedCity(value);
+              // Show immediate feedback
+              alert(`City changed to: ${value} 🏙️\n\nUpdating dashboard with ${value} data...`);
+            }}
             style={{ width: '100%' }}
             size="large"
+            placeholder="Select a Michigan city"
+            showSearch
+            filterOption={(input, option) => {
+              const cityName = option.children[1].props.children;
+              return cityName.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+            }}
           >
             {cities.map(city => (
               <Option key={city.name} value={city.name}>
@@ -193,26 +209,35 @@ const App = () => {
           <Divider />
 
           <Title level={5}>City Overview</Title>
-          {cities.find(c => c.name === selectedCity) && (
-            <Card size="small">
-              <Statistic
-                title="Sustainability Score"
-                value={cities.find(c => c.name === selectedCity)?.sustainability}
-                suffix="/100"
-                valueStyle={{ color: '#52c41a' }}
-              />
-              <Progress 
-                percent={cities.find(c => c.name === selectedCity)?.sustainability} 
-                strokeColor="#52c41a"
-                size="small"
-                style={{ marginTop: '8px' }}
-              />
-              <div style={{ marginTop: '12px', fontSize: '12px', color: '#666' }}>
-                <div>Population: {cities.find(c => c.name === selectedCity)?.population}</div>
-                <div>Annual Emissions: {cities.find(c => c.name === selectedCity)?.emissions}</div>
-              </div>
-            </Card>
-          )}
+          {(() => {
+            const currentCity = cities.find(c => c.name === selectedCity);
+            console.log('Current city data:', currentCity);
+            return currentCity ? (
+              <Card size="small">
+                <Statistic
+                  title="Sustainability Score"
+                  value={currentCity.sustainability}
+                  suffix="/100"
+                  valueStyle={{ color: '#52c41a' }}
+                />
+                <Progress 
+                  percent={currentCity.sustainability} 
+                  strokeColor="#52c41a"
+                  size="small"
+                  style={{ marginTop: '8px' }}
+                />
+                <div style={{ marginTop: '12px', fontSize: '12px', color: '#666' }}>
+                  <div>Population: {currentCity.population}</div>
+                  <div>Annual Emissions: {currentCity.emissions}</div>
+                  <div>State: {currentCity.state}</div>
+                </div>
+              </Card>
+            ) : (
+              <Card size="small">
+                <Text type="secondary">No city data available</Text>
+              </Card>
+            );
+          })()}
         </Sider>
 
         <Content style={{ padding: '24px', background: '#f8f9fa' }}>
@@ -220,12 +245,43 @@ const App = () => {
             <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
               <Col span={24}>
                 <Alert
-                  message="Welcome to AI Sustainable Cities Planner - Michigan Edition"
-                  description="Get AI-powered insights and recommendations to make Michigan cities more sustainable, efficient, and equitable. Analyze 30+ Michigan cities with real-time data."
+                  message={`Welcome to AI Sustainable Cities Planner - Michigan Edition`}
+                  description={`Currently analyzing: ${selectedCity}, Michigan. Get AI-powered insights and recommendations to make Michigan cities more sustainable, efficient, and equitable. Analyze 30+ Michigan cities with real-time data.`}
                   type="info"
                   showIcon
                   style={{ marginBottom: '24px' }}
                 />
+              </Col>
+            </Row>
+
+            <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+              <Col span={24}>
+                <Card title={`📊 ${selectedCity} City Analysis`} style={{ background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)' }}>
+                  <Row gutter={[16, 16]}>
+                    <Col xs={24} sm={8}>
+                      <Statistic
+                        title="Sustainability Score"
+                        value={cities.find(c => c.name === selectedCity)?.sustainability || 0}
+                        suffix="/100"
+                        valueStyle={{ color: '#52c41a', fontSize: '24px' }}
+                      />
+                    </Col>
+                    <Col xs={24} sm={8}>
+                      <Statistic
+                        title="Population"
+                        value={cities.find(c => c.name === selectedCity)?.population || 'N/A'}
+                        valueStyle={{ color: '#1890ff', fontSize: '20px' }}
+                      />
+                    </Col>
+                    <Col xs={24} sm={8}>
+                      <Statistic
+                        title="Annual CO₂ Emissions"
+                        value={cities.find(c => c.name === selectedCity)?.emissions || 'N/A'}
+                        valueStyle={{ color: '#fa541c', fontSize: '18px' }}
+                      />
+                    </Col>
+                  </Row>
+                </Card>
               </Col>
             </Row>
 
