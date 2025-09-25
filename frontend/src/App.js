@@ -22,7 +22,6 @@ const App = () => {
   const [showCityDashboard, setShowCityDashboard] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
-  const [selectedPolicy, setSelectedPolicy] = useState(null);
   const [policyForm] = Form.useForm();
 
   const cities = [
@@ -99,7 +98,6 @@ const App = () => {
   };
 
   const handleAnalyzePolicy = (policy) => {
-    setSelectedPolicy(policy);
     alert(`Analyzing Policy: ${policy.name} 📊\n\n• Impact Level: ${policy.impact}\n• Estimated Cost: ${policy.cost}\n• Implementation Time: ${policy.time}\n• Expected ROI: ${policy.impact === 'High' ? '2.5x' : policy.impact === 'Medium' ? '1.8x' : '1.2x'}`);
   };
 
