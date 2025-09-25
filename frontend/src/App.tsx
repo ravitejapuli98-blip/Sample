@@ -18,14 +18,42 @@ const { Option } = Select;
 const { TabPane } = Tabs;
 
 const App: React.FC = () => {
-  const [selectedCity, setSelectedCity] = useState('San Francisco');
+  const [selectedCity, setSelectedCity] = useState('Detroit');
   const [selectedPolicy, setSelectedPolicy] = useState('');
   const [showPolicyModal, setShowPolicyModal] = useState(false);
 
   const cities = [
-    { name: 'San Francisco', sustainability: 78, population: '873K', emissions: '2.5M tons' },
-    { name: 'Portland', sustainability: 85, population: '652K', emissions: '1.8M tons' },
-    { name: 'Seattle', sustainability: 82, population: '749K', emissions: '2.2M tons' }
+    // Major Michigan Cities
+    { name: 'Detroit', sustainability: 65, population: '639K', emissions: '8.2M tons', state: 'MI' },
+    { name: 'Grand Rapids', sustainability: 78, population: '198K', emissions: '2.1M tons', state: 'MI' },
+    { name: 'Warren', sustainability: 72, population: '139K', emissions: '1.8M tons', state: 'MI' },
+    { name: 'Sterling Heights', sustainability: 75, population: '134K', emissions: '1.6M tons', state: 'MI' },
+    { name: 'Lansing', sustainability: 80, population: '118K', emissions: '1.4M tons', state: 'MI' },
+    { name: 'Ann Arbor', sustainability: 88, population: '123K', emissions: '1.2M tons', state: 'MI' },
+    { name: 'Flint', sustainability: 58, population: '95K', emissions: '1.8M tons', state: 'MI' },
+    { name: 'Dearborn', sustainability: 70, population: '109K', emissions: '1.9M tons', state: 'MI' },
+    { name: 'Livonia', sustainability: 73, population: '95K', emissions: '1.3M tons', state: 'MI' },
+    { name: 'Westland', sustainability: 68, population: '85K', emissions: '1.1M tons', state: 'MI' },
+    { name: 'Troy', sustainability: 82, population: '87K', emissions: '1.0M tons', state: 'MI' },
+    { name: 'Farmington Hills', sustainability: 85, population: '81K', emissions: '0.9M tons', state: 'MI' },
+    { name: 'Kalamazoo', sustainability: 77, population: '76K', emissions: '1.1M tons', state: 'MI' },
+    { name: 'Wyoming', sustainability: 71, population: '76K', emissions: '1.2M tons', state: 'MI' },
+    { name: 'Southfield', sustainability: 74, population: '76K', emissions: '1.0M tons', state: 'MI' },
+    { name: 'Rochester Hills', sustainability: 86, population: '75K', emissions: '0.8M tons', state: 'MI' },
+    { name: 'Taylor', sustainability: 66, population: '63K', emissions: '1.1M tons', state: 'MI' },
+    { name: 'Pontiac', sustainability: 62, population: '61K', emissions: '1.3M tons', state: 'MI' },
+    { name: 'St. Clair Shores', sustainability: 79, population: '59K', emissions: '0.9M tons', state: 'MI' },
+    { name: 'Royal Oak', sustainability: 84, population: '58K', emissions: '0.8M tons', state: 'MI' },
+    { name: 'Novi', sustainability: 87, population: '66K', emissions: '0.7M tons', state: 'MI' },
+    { name: 'Dearborn Heights', sustainability: 69, population: '57K', emissions: '1.0M tons', state: 'MI' },
+    { name: 'Battle Creek', sustainability: 70, population: '52K', emissions: '0.9M tons', state: 'MI' },
+    { name: 'Saginaw', sustainability: 64, population: '48K', emissions: '1.2M tons', state: 'MI' },
+    { name: 'Kentwood', sustainability: 76, population: '51K', emissions: '0.8M tons', state: 'MI' },
+    { name: 'East Lansing', sustainability: 89, population: '48K', emissions: '0.6M tons', state: 'MI' },
+    { name: 'Roseville', sustainability: 72, population: '47K', emissions: '0.9M tons', state: 'MI' },
+    { name: 'Portage', sustainability: 81, population: '48K', emissions: '0.7M tons', state: 'MI' },
+    { name: 'Midland', sustainability: 83, population: '42K', emissions: '0.8M tons', state: 'MI' },
+    { name: 'Lincoln Park', sustainability: 67, population: '38K', emissions: '0.8M tons', state: 'MI' }
   ];
 
   const policies = [
@@ -106,7 +134,7 @@ const App: React.FC = () => {
               <Option key={city.name} value={city.name}>
                 <Space>
                   <EnvironmentOutlined />
-                  {city.name}
+                  {city.name}, {city.state}
                 </Space>
               </Option>
             ))}
@@ -142,8 +170,8 @@ const App: React.FC = () => {
             <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
               <Col span={24}>
                 <Alert
-                  message="Welcome to AI Sustainable Cities Planner"
-                  description="Get AI-powered insights and recommendations to make your city more sustainable, efficient, and equitable."
+                  message="Welcome to AI Sustainable Cities Planner - Michigan Edition"
+                  description="Get AI-powered insights and recommendations to make Michigan cities more sustainable, efficient, and equitable. Analyze 30+ Michigan cities with real-time data."
                   type="info"
                   showIcon
                   style={{ marginBottom: '24px' }}
@@ -155,13 +183,13 @@ const App: React.FC = () => {
               <Col xs={24} sm={12} lg={6}>
                 <Card hoverable>
                   <Statistic
-                    title="Cities Analyzed"
-                    value={3}
+                    title="Michigan Cities"
+                    value={30}
                     prefix={<EnvironmentOutlined style={{ color: '#52c41a' }} />}
                     valueStyle={{ color: '#52c41a' }}
                   />
                   <Text type="secondary" style={{ fontSize: '12px' }}>
-                    Real-time data integration
+                    All major MI cities
                   </Text>
                 </Card>
               </Col>

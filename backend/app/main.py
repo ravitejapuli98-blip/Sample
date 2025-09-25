@@ -30,7 +30,8 @@ async def root():
             "simulations": "/api/v1/simulations",
             "predictions": "/api/v1/predictions",
             "ai": "/api/v1/ai",
-            "real-data": "/api/v1/real-data"
+            "real-data": "/api/v1/real-data",
+            "michigan": "/api/v1/michigan"
         }
     }
 
