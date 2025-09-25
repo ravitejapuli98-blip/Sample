@@ -167,7 +167,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Responsive design */
+/* Mobile-first responsive design */
 @media (max-width: 768px) {
   .ant-layout-sider {
     position: fixed !important;
@@ -175,10 +175,107 @@
     left: 0;
     top: 0;
     z-index: 1000;
+    width: 280px !important;
   }
   
   .ant-layout-content {
     margin-left: 0 !important;
+    padding: 16px !important;
+  }
+
+  .ant-layout-header {
+    padding: 0 16px !important;
+  }
+
+  .ant-layout-header .ant-typography {
+    font-size: 18px !important;
+  }
+
+  .ant-card {
+    margin-bottom: 16px;
+  }
+
+  .ant-statistic-title {
+    font-size: 12px !important;
+  }
+
+  .ant-statistic-content {
+    font-size: 16px !important;
+  }
+
+  .ant-btn {
+    font-size: 14px;
+    height: 36px;
+  }
+
+  .ant-select {
+    font-size: 14px;
+  }
+
+  .ant-modal {
+    margin: 16px;
+    max-width: calc(100vw - 32px);
+  }
+
+  .ant-list-item {
+    padding: 12px 0;
+  }
+
+  .ant-space {
+    gap: 8px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .ant-layout-sider {
+    width: 100vw !important;
+  }
+
+  .ant-layout-content {
+    padding: 12px !important;
+  }
+
+  .ant-layout-header {
+    padding: 0 12px !important;
+  }
+
+  .ant-layout-header .ant-typography {
+    font-size: 16px !important;
+  }
+
+  .ant-card {
+    margin-bottom: 12px;
+  }
+
+  .ant-statistic-title {
+    font-size: 11px !important;
+  }
+
+  .ant-statistic-content {
+    font-size: 14px !important;
+  }
+
+  .ant-btn {
+    font-size: 12px;
+    height: 32px;
+    padding: 4px 8px;
+  }
+
+  .ant-select {
+    font-size: 12px;
+  }
+
+  .ant-modal {
+    margin: 8px;
+    max-width: calc(100vw - 16px);
+  }
+
+  .ant-list-item {
+    padding: 8px 0;
+  }
+
+  .ant-space {
+    gap: 4px !important;
   }
 }
 

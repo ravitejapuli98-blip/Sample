@@ -8,7 +8,8 @@ import {
   EnvironmentOutlined, CarOutlined, ThunderboltOutlined, CloudOutlined,
   SearchOutlined, BulbOutlined, BarChartOutlined,
   ClockCircleOutlined,
-  PlusOutlined, EyeOutlined, DownloadOutlined, ShareAltOutlined
+  PlusOutlined, EyeOutlined, DownloadOutlined, ShareAltOutlined,
+  MenuOutlined
 } from '@ant-design/icons';
 import './App.css';
 
@@ -22,6 +23,7 @@ const App = () => {
   const [showCityDashboard, setShowCityDashboard] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [policyForm] = Form.useForm();
 
   const cities = [
@@ -140,12 +142,18 @@ const App = () => {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '100%' }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
+            <Button 
+              type="text" 
+              icon={<MenuOutlined />} 
+              style={{ color: '#fff', marginRight: '12px', display: window.innerWidth <= 768 ? 'block' : 'none' }}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            />
             <EnvironmentOutlined style={{ fontSize: '28px', color: '#fff', marginRight: '16px' }} />
-            <Title level={3} style={{ margin: 0, color: '#fff' }}>
+            <Title level={3} style={{ margin: 0, color: '#fff', fontSize: window.innerWidth <= 768 ? '18px' : '24px' }}>
               AI Sustainable Cities Planner - Michigan Edition
             </Title>
           </div>
-            <Space>
+            <Space style={{ display: window.innerWidth <= 768 ? 'none' : 'flex' }}>
               <Button type="primary" ghost icon={<SearchOutlined />} onClick={handleExploreCities}>
                 Explore Cities
               </Button>
@@ -157,7 +165,14 @@ const App = () => {
       </Header>
 
       <Layout>
-        <Sider width={300} style={{ background: '#fff', padding: '24px' }}>
+        <Sider 
+          width={300} 
+          style={{ 
+            background: '#fff', 
+            padding: '24px',
+            display: window.innerWidth <= 768 ? (mobileMenuOpen ? 'block' : 'none') : 'block'
+          }}
+        >
           <Title level={4}>Quick Actions</Title>
           <Space direction="vertical" style={{ width: '100%' }} size="middle">
             <Button 
