@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Sustainable Cities Planner</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            padding: 40px 0;
+        }
+        .header h1 {
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .header p {
+            font-size: 1.2em;
+            margin: 10px 0;
+            opacity: 0.9;
+        }
+        .status {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+        .status h2 {
+            margin-top: 0;
+            color: #4CAF50;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+        .feature {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .feature h3 {
+            color: #FFD700;
+            margin-top: 0;
+        }
+        .api-endpoints {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+        .endpoint {
+            background: rgba(0,0,0,0.2);
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        .footer {
+            text-align: center;
+            padding: 40px 0;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌱 AI Sustainable Cities Planner</h1>
+            <p>Multi-agent simulation and planning tool for sustainable urban development</p>
+        </div>
+
+        <div class="status">
+            <h2>✅ System Status: Online</h2>
+            <p>Your AI Sustainable Cities Planner is successfully deployed on AWS ECS Fargate!</p>
+            <p><strong>Deployment URL:</strong> <a href="/" style="color: #FFD700;">http://prod-sus-cities-alb-73707419.us-east-1.elb.amazonaws.com</a></p>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <h3>🏙️ City Data Analysis</h3>
+                <p>Ingest and analyze mobility, air quality, and energy data from cities worldwide. Get insights into urban sustainability metrics and trends.</p>
+            </div>
+            <div class="feature">
+                <h3>📊 Policy Recommendations</h3>
+                <p>AI-powered policy suggestions including bus lane expansion, EV charging infrastructure, and green building standards.</p>
+            </div>
+            <div class="feature">
+                <h3>🔮 Outcome Prediction</h3>
+                <p>Predict the impact of policy implementations on travel time, emissions, grid load, and equity outcomes.</p>
+            </div>
+            <div class="feature">
+                <h3>🤖 Multi-Agent Simulation</h3>
+                <p>Advanced simulation engine modeling urban agent behaviors and policy impact across multiple scenarios.</p>
+            </div>
+        </div>
+
+        <div class="api-endpoints">
+            <h3>🔗 API Endpoints</h3>
+            <div class="endpoint">GET /health - Health check endpoint</div>
+            <div class="endpoint">GET /api/v1/cities - Retrieve city data and metrics</div>
+            <div class="endpoint">GET /api/v1/policies - Get policy recommendations</div>
+            <div class="endpoint">GET /api/v1/simulations - View simulation results</div>
+            <div class="endpoint">GET /api/v1/predictions - Access outcome predictions</div>
+        </div>
+
+        <div class="footer">
+            <p>🚀 Deployed on AWS ECS Fargate | Built with FastAPI & React</p>
+            <p>Version 1.0.0 | Environment: Production</p>
+        </div>
+    </div>
+
+    <script>
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('AI Sustainable Cities Planner loaded successfully!');
+            
+            // Add click handlers for endpoints
+            const endpoints = document.querySelectorAll('.endpoint');
+            endpoints.forEach(endpoint => {
+                endpoint.addEventListener('click', function() {
+                    const endpointText = this.textContent.split(' - ')[0];
+                    const url = window.location.origin + endpointText;
+                    window.open(url, '_blank');
+                });
+                endpoint.style.cursor = 'pointer';
+                endpoint.title = 'Click to test endpoint';
+            });
+        });
+    </script>
+</body>
+</html>

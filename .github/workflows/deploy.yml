@@ -1,0 +1,78 @@
+name: Deploy AI Sustainable Cities Planner to AWS ECS
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: sustainable-cities-backend
+  ECS_SERVICE: prod-sus-cities-service
+  ECS_CLUSTER: prod-sus-cities-cluster
+  ECS_TASK_DEFINITION: prod-sus-cities-task
+  CONTAINER_NAME: backend-api
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Build a docker container and push it to ECR
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: terraform/ecs-task-definition.json
+        container-name: ${{ env.CONTAINER_NAME }}
+        image: ${{ steps.build-image.outputs.image }}
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ env.ECS_SERVICE }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
+
+    - name: Verify deployment
+      run: |
+        echo "🚀 Deployment completed successfully!"
+        echo "🌐 Your AI Sustainable Cities Planner is now live at:"
+        echo "   http://prod-sus-cities-alb-73707419.us-east-1.elb.amazonaws.com"
+        echo ""
+        echo "🔗 Test these endpoints:"
+        echo "   • Health Check: http://prod-sus-cities-alb-73707419.us-east-1.elb.amazonaws.com/health"
+        echo "   • Cities Data: http://prod-sus-cities-alb-73707419.us-east-1.elb.amazonaws.com/api/v1/cities"
+        echo "   • Policies: http://prod-sus-cities-alb-73707419.us-east-1.elb.amazonaws.com/api/v1/policies"
+        echo "   • Simulations: http://prod-sus-cities-alb-73707419.us-east-1.elb.amazonaws.com/api/v1/simulations"
