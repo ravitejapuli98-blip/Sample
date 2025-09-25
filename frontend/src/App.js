@@ -19,6 +19,11 @@ const { Option } = Select;
 const App = () => {
   const [selectedCity, setSelectedCity] = useState('Detroit');
   const [showPolicyModal, setShowPolicyModal] = useState(false);
+  const [showCityDashboard, setShowCityDashboard] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [selectedPolicy, setSelectedPolicy] = useState(null);
+  const [policyForm] = Form.useForm();
 
   const cities = [
     // Major Michigan Cities
@@ -71,6 +76,55 @@ const App = () => {
     }
   };
 
+  // Handler functions
+  const handleExploreCities = () => {
+    alert(`Exploring all ${cities.length} Michigan cities! 🏙️\n\nTop cities by sustainability:\n${cities.slice(0, 5).map(c => `• ${c.name}: ${c.sustainability}/100`).join('\n')}`);
+  };
+
+  const handleGetRecommendations = () => {
+    const city = cities.find(c => c.name === selectedCity);
+    alert(`AI Recommendations for ${selectedCity}, Michigan: 🤖\n\n• Sustainability Score: ${city.sustainability}/100\n• Priority: ${city.sustainability < 70 ? 'High' : city.sustainability < 85 ? 'Medium' : 'Low'}\n• Focus Areas: ${city.sustainability < 70 ? 'Air Quality, Transportation' : 'Energy Efficiency, Green Infrastructure'}`);
+  };
+
+  const handleViewDashboard = () => {
+    setShowCityDashboard(true);
+  };
+
+  const handleExportReport = () => {
+    setShowExportModal(true);
+  };
+
+  const handleShareInsights = () => {
+    setShowShareModal(true);
+  };
+
+  const handleAnalyzePolicy = (policy) => {
+    setSelectedPolicy(policy);
+    alert(`Analyzing Policy: ${policy.name} 📊\n\n• Impact Level: ${policy.impact}\n• Estimated Cost: ${policy.cost}\n• Implementation Time: ${policy.time}\n• Expected ROI: ${policy.impact === 'High' ? '2.5x' : policy.impact === 'Medium' ? '1.8x' : '1.2x'}`);
+  };
+
+  const handleRecommendPolicy = (policy) => {
+    alert(`Policy Recommendation: ${policy.name} 💡\n\n✅ Recommended for ${selectedCity}\n• High impact on sustainability\n• Good cost-benefit ratio\n• Aligns with city goals\n\nNext steps: Contact city planning department`);
+  };
+
+  const handlePolicyFormSubmit = (values) => {
+    console.log('Policy Analysis Request:', values);
+    alert(`Policy Analysis Submitted! 📋\n\nType: ${values.policyType}\nBudget: ${values.budgetRange}\nDescription: ${values.description}\n\nAI analysis will be available in 2-3 minutes.`);
+    setShowPolicyModal(false);
+    policyForm.resetFields();
+  };
+
+  const handleExportData = (format) => {
+    alert(`Exporting ${selectedCity} data as ${format} 📄\n\nIncluding:\n• City statistics\n• Policy recommendations\n• Sustainability metrics\n• AI insights\n\nDownload will start shortly...`);
+    setShowExportModal(false);
+  };
+
+  const handleShareData = (platform) => {
+    const url = window.location.href;
+    alert(`Sharing ${selectedCity} insights on ${platform} 📤\n\nURL: ${url}\n\n"Check out ${selectedCity}'s sustainability analysis and AI-powered policy recommendations!"`);
+    setShowShareModal(false);
+  };
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Header style={{ 
@@ -85,14 +139,14 @@ const App = () => {
               AI Sustainable Cities Planner - Michigan Edition
             </Title>
           </div>
-          <Space>
-            <Button type="primary" ghost icon={<SearchOutlined />}>
-              Explore Cities
-            </Button>
-            <Button type="primary" ghost icon={<BulbOutlined />}>
-              Get Recommendations
-            </Button>
-          </Space>
+            <Space>
+              <Button type="primary" ghost icon={<SearchOutlined />} onClick={handleExploreCities}>
+                Explore Cities
+              </Button>
+              <Button type="primary" ghost icon={<BulbOutlined />} onClick={handleGetRecommendations}>
+                Get Recommendations
+              </Button>
+            </Space>
         </div>
       </Header>
 
@@ -108,15 +162,15 @@ const App = () => {
             >
               Analyze New Policy
             </Button>
-            <Button block icon={<BarChartOutlined />}>
-              View City Dashboard
-            </Button>
-            <Button block icon={<DownloadOutlined />}>
-              Export Report
-            </Button>
-            <Button block icon={<ShareAltOutlined />}>
-              Share Insights
-            </Button>
+              <Button block icon={<BarChartOutlined />} onClick={handleViewDashboard}>
+                View City Dashboard
+              </Button>
+              <Button block icon={<DownloadOutlined />} onClick={handleExportReport}>
+                Export Report
+              </Button>
+              <Button block icon={<ShareAltOutlined />} onClick={handleShareInsights}>
+                Share Insights
+              </Button>
           </Space>
 
           <Divider />
@@ -239,12 +293,12 @@ const App = () => {
                   <List
                     dataSource={policies}
                     renderItem={policy => (
-                      <List.Item
-                        actions={[
-                          <Button type="link" icon={<EyeOutlined />}>Analyze</Button>,
-                          <Button type="link" icon={<BulbOutlined />}>Recommend</Button>
-                        ]}
-                      >
+                        <List.Item
+                          actions={[
+                            <Button type="link" icon={<EyeOutlined />} onClick={() => handleAnalyzePolicy(policy)}>Analyze</Button>,
+                            <Button type="link" icon={<BulbOutlined />} onClick={() => handleRecommendPolicy(policy)}>Recommend</Button>
+                          ]}
+                        >
                         <List.Item.Meta
                           avatar={
                             <Avatar 
@@ -393,43 +447,190 @@ const App = () => {
         </Content>
       </Layout>
 
+        <Modal
+          title="Analyze New Policy"
+          open={showPolicyModal}
+          onCancel={() => setShowPolicyModal(false)}
+          footer={[
+            <Button key="cancel" onClick={() => setShowPolicyModal(false)}>
+              Cancel
+            </Button>,
+            <Button key="analyze" type="primary" icon={<BulbOutlined />} onClick={() => policyForm.submit()}>
+              Analyze Policy
+            </Button>
+          ]}
+        >
+          <Form layout="vertical" form={policyForm} onFinish={handlePolicyFormSubmit}>
+            <Form.Item label="Policy Type" name="policyType" rules={[{ required: true, message: 'Please select a policy type!' }]}>
+              <Select placeholder="Select policy type" size="large">
+                <Option value="transportation">Transportation</Option>
+                <Option value="energy">Energy</Option>
+                <Option value="environmental">Environmental</Option>
+                <Option value="housing">Housing</Option>
+              </Select>
+            </Form.Item>
+            <Form.Item label="Policy Description" name="description" rules={[{ required: true, message: 'Please describe the policy!' }]}>
+              <Input.TextArea 
+                rows={4} 
+                placeholder="Describe the policy you want to analyze..."
+              />
+            </Form.Item>
+            <Form.Item label="Budget Range" name="budgetRange" rules={[{ required: true, message: 'Please select a budget range!' }]}>
+              <Select placeholder="Select budget range" size="large">
+                <Option value="low">Under $10M</Option>
+                <Option value="medium">$10M - $50M</Option>
+                <Option value="high">$50M - $100M</Option>
+                <Option value="very-high">Over $100M</Option>
+              </Select>
+            </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* Export Modal */}
       <Modal
-        title="Analyze New Policy"
-        open={showPolicyModal}
-        onCancel={() => setShowPolicyModal(false)}
+        title="Export City Data"
+        open={showExportModal}
+        onCancel={() => setShowExportModal(false)}
         footer={[
-          <Button key="cancel" onClick={() => setShowPolicyModal(false)}>
+          <Button key="cancel" onClick={() => setShowExportModal(false)}>
             Cancel
-          </Button>,
-          <Button key="analyze" type="primary" icon={<BulbOutlined />}>
-            Analyze Policy
           </Button>
         ]}
       >
-        <Form layout="vertical">
-          <Form.Item label="Policy Type">
-            <Select placeholder="Select policy type" size="large">
-              <Option value="transportation">Transportation</Option>
-              <Option value="energy">Energy</Option>
-              <Option value="environmental">Environmental</Option>
-              <Option value="housing">Housing</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item label="Policy Description">
-            <Input.TextArea 
-              rows={4} 
-              placeholder="Describe the policy you want to analyze..."
-            />
-          </Form.Item>
-          <Form.Item label="Budget Range">
-            <Select placeholder="Select budget range" size="large">
-              <Option value="low">Under $10M</Option>
-              <Option value="medium">$10M - $50M</Option>
-              <Option value="high">$50M - $100M</Option>
-              <Option value="very-high">Over $100M</Option>
-            </Select>
-          </Form.Item>
-        </Form>
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          <Title level={4}>Choose Export Format</Title>
+          <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            <Button 
+              type="primary" 
+              size="large" 
+              block 
+              onClick={() => handleExportData('PDF Report')}
+            >
+              📄 PDF Report
+            </Button>
+            <Button 
+              size="large" 
+              block 
+              onClick={() => handleExportData('Excel Spreadsheet')}
+            >
+              📊 Excel Spreadsheet
+            </Button>
+            <Button 
+              size="large" 
+              block 
+              onClick={() => handleExportData('CSV Data')}
+            >
+              📈 CSV Data
+            </Button>
+          </Space>
+        </div>
+      </Modal>
+
+      {/* Share Modal */}
+      <Modal
+        title="Share City Insights"
+        open={showShareModal}
+        onCancel={() => setShowShareModal(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setShowShareModal(false)}>
+            Cancel
+          </Button>
+        ]}
+      >
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          <Title level={4}>Share on Social Media</Title>
+          <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            <Button 
+              type="primary" 
+              size="large" 
+              block 
+              onClick={() => handleShareData('Twitter')}
+            >
+              🐦 Twitter
+            </Button>
+            <Button 
+              size="large" 
+              block 
+              onClick={() => handleShareData('LinkedIn')}
+            >
+              💼 LinkedIn
+            </Button>
+            <Button 
+              size="large" 
+              block 
+              onClick={() => handleShareData('Facebook')}
+            >
+              📘 Facebook
+            </Button>
+            <Button 
+              size="large" 
+              block 
+              onClick={() => handleShareData('Email')}
+            >
+              📧 Email
+            </Button>
+          </Space>
+        </div>
+      </Modal>
+
+      {/* City Dashboard Modal */}
+      <Modal
+        title={`${selectedCity} City Dashboard`}
+        open={showCityDashboard}
+        onCancel={() => setShowCityDashboard(false)}
+        width={800}
+        footer={[
+          <Button key="close" onClick={() => setShowCityDashboard(false)}>
+            Close
+          </Button>
+        ]}
+      >
+        <div style={{ padding: '20px' }}>
+          <Row gutter={[16, 16]}>
+            <Col span={12}>
+              <Card title="Sustainability Metrics" size="small">
+                <Statistic
+                  title="Overall Score"
+                  value={cities.find(c => c.name === selectedCity)?.sustainability}
+                  suffix="/100"
+                  valueStyle={{ color: '#52c41a' }}
+                />
+                <Progress 
+                  percent={cities.find(c => c.name === selectedCity)?.sustainability} 
+                  strokeColor="#52c41a"
+                  style={{ marginTop: '8px' }}
+                />
+              </Card>
+            </Col>
+            <Col span={12}>
+              <Card title="City Statistics" size="small">
+                <div style={{ fontSize: '14px' }}>
+                  <div>Population: {cities.find(c => c.name === selectedCity)?.population}</div>
+                  <div>Annual Emissions: {cities.find(c => c.name === selectedCity)?.emissions}</div>
+                  <div>State: {cities.find(c => c.name === selectedCity)?.state}</div>
+                </div>
+              </Card>
+            </Col>
+          </Row>
+          <Row gutter={[16, 16]} style={{ marginTop: '16px' }}>
+            <Col span={24}>
+              <Card title="AI Recommendations" size="small">
+                <List
+                  size="small"
+                  dataSource={policies.slice(0, 3)}
+                  renderItem={policy => (
+                    <List.Item>
+                      <Space>
+                        <Tag color={getImpactColor(policy.impact)}>{policy.impact}</Tag>
+                        {policy.name} - {policy.cost}
+                      </Space>
+                    </List.Item>
+                  )}
+                />
+              </Card>
+            </Col>
+          </Row>
+        </div>
       </Modal>
     </Layout>
   );
