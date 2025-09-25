@@ -75,6 +75,14 @@ const App = () => {
     }
   };
 
+  const getSustainabilityLevel = (score) => {
+    if (score >= 90) return { level: 'Excellent', color: '#52c41a', emoji: '🏆' };
+    if (score >= 80) return { level: 'Very Good', color: '#73d13d', emoji: '🌟' };
+    if (score >= 70) return { level: 'Good', color: '#faad14', emoji: '✅' };
+    if (score >= 60) return { level: 'Fair', color: '#ff7a45', emoji: '⚠️' };
+    return { level: 'Poor', color: '#ff4d4f', emoji: '❌' };
+  };
+
   // Handler functions
   const handleExploreCities = () => {
     alert(`Exploring all ${cities.length} Michigan cities! 🏙️\n\nTop cities by sustainability:\n${cities.slice(0, 5).map(c => `• ${c.name}: ${c.sustainability}/100`).join('\n')}`);
@@ -224,17 +232,23 @@ const App = () => {
                 );
               }
               
+              const sustainability = getSustainabilityLevel(currentCity.sustainability || 0);
               return (
                 <Card size="small">
                   <Statistic
                     title="Sustainability Score"
                     value={currentCity.sustainability || 0}
                     suffix="/100"
-                    valueStyle={{ color: '#52c41a' }}
+                    valueStyle={{ color: sustainability.color }}
                   />
+                  <div style={{ marginTop: '8px', textAlign: 'center' }}>
+                    <Tag color={sustainability.color} style={{ fontSize: '12px' }}>
+                      {sustainability.emoji} {sustainability.level}
+                    </Tag>
+                  </div>
                   <Progress 
                     percent={currentCity.sustainability || 0} 
-                    strokeColor="#52c41a"
+                    strokeColor={sustainability.color}
                     size="small"
                     style={{ marginTop: '8px' }}
                   />
@@ -280,6 +294,7 @@ const App = () => {
                         return <Text type="secondary">Loading city data...</Text>;
                       }
                       
+                      const sustainability = getSustainabilityLevel(currentCity.sustainability || 0);
                       return (
                         <Row gutter={[16, 16]}>
                           <Col xs={24} sm={8}>
@@ -287,8 +302,13 @@ const App = () => {
                               title="Sustainability Score"
                               value={currentCity.sustainability || 0}
                               suffix="/100"
-                              valueStyle={{ color: '#52c41a', fontSize: '24px' }}
+                              valueStyle={{ color: sustainability.color, fontSize: '24px' }}
                             />
+                            <div style={{ marginTop: '8px', textAlign: 'center' }}>
+                              <Tag color={sustainability.color} style={{ fontSize: '14px' }}>
+                                {sustainability.emoji} {sustainability.level}
+                              </Tag>
+                            </div>
                           </Col>
                           <Col xs={24} sm={8}>
                             <Statistic
