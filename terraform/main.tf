@@ -400,6 +400,123 @@ output "application_url" {
   value       = "http://${aws_lb.main.dns_name}"
 }
 
+# RDS Subnet Group
+resource "aws_db_subnet_group" "main" {
+  name       = "${local.name_prefix}-db-subnet-group"
+  subnet_ids = [aws_subnet.public_1.id, aws_subnet.public_2.id]
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-db-subnet-group"
+  })
+}
+
+# Security Group for RDS
+resource "aws_security_group" "rds" {
+  name_prefix = "${local.name_prefix}-rds-"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [aws_security_group.ecs_tasks.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-rds-sg"
+  })
+}
+
+# RDS PostgreSQL Instance
+resource "aws_db_instance" "main" {
+  identifier = "${local.name_prefix}-db"
+  
+  engine = "postgres"
+  instance_class = "db.t3.micro"
+  
+  allocated_storage     = 20
+  max_allocated_storage = 100
+  storage_type          = "gp2"
+  storage_encrypted     = true
+  
+  db_name  = "sustainable_cities"
+  username = "sustainable_admin"
+  password = "SustainableCities2024!"
+  
+  vpc_security_group_ids = [aws_security_group.rds.id]
+  db_subnet_group_name   = aws_db_subnet_group.main.name
+  
+  backup_retention_period = 7
+  backup_window          = "03:00-04:00"
+  maintenance_window     = "sun:04:00-sun:05:00"
+  
+  skip_final_snapshot = true
+  deletion_protection = false
+  
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-db"
+  })
+}
+
+# ElastiCache Subnet Group
+resource "aws_elasticache_subnet_group" "main" {
+  name       = "${local.name_prefix}-cache-subnet-group"
+  subnet_ids = [aws_subnet.public_1.id, aws_subnet.public_2.id]
+}
+
+# Security Group for ElastiCache
+resource "aws_security_group" "elasticache" {
+  name_prefix = "${local.name_prefix}-cache-"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port       = 6379
+    to_port         = 6379
+    protocol        = "tcp"
+    security_groups = [aws_security_group.ecs_tasks.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-cache-sg"
+  })
+}
+
+# ElastiCache Redis Cluster
+resource "aws_elasticache_replication_group" "main" {
+  replication_group_id       = "${local.name_prefix}-redis"
+  description                = "Redis cluster for sustainable cities planner"
+  
+  node_type                  = "cache.t3.micro"
+  port                       = 6379
+  parameter_group_name       = "default.redis7"
+  
+  num_cache_clusters         = 1
+  
+  subnet_group_name          = aws_elasticache_subnet_group.main.name
+  security_group_ids         = [aws_security_group.elasticache.id]
+  
+  at_rest_encryption_enabled = true
+  transit_encryption_enabled = true
+  
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-redis"
+  })
+}
+
 # S3 Bucket for Frontend
 resource "aws_s3_bucket" "frontend" {
   bucket = "${local.name_prefix}-frontend"
@@ -457,4 +574,24 @@ output "frontend_website_url" {
 output "frontend_bucket_name" {
   description = "Name of the S3 bucket for frontend"
   value       = aws_s3_bucket.frontend.bucket
+}
+
+output "database_endpoint" {
+  description = "RDS instance endpoint"
+  value       = aws_db_instance.main.endpoint
+}
+
+output "database_port" {
+  description = "RDS instance port"
+  value       = aws_db_instance.main.port
+}
+
+output "redis_endpoint" {
+  description = "ElastiCache Redis endpoint"
+  value       = aws_elasticache_replication_group.main.primary_endpoint_address
+}
+
+output "redis_port" {
+  description = "ElastiCache Redis port"
+  value       = aws_elasticache_replication_group.main.port
 }
